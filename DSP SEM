@@ -1,0 +1,1284 @@
+pole   zero plot
+
+sgtitle('POLE ZERO PLOT 22BEC0xx')
+b=input('Enter the coeff numerator');
+a=input('Enter the coeff denominator');
+t=input('Enter the order of the polynomial');
+HZ=filt(b,a,t);
+disp('the given system function is')
+disp(HZ)
+%polezeroplot
+subplot(3,2,1)
+zplane(b,a)
+title('Pole Zero Plot')
+%impusle response
+disp('the impulse response of the system')
+[h,n]=impz(b,a)
+subplot(3,2,2)
+stem(n,h)
+title('Impusle Response')
+xlabel('Time')
+ylabel('Amplitidue')
+%frequency response
+[H,W]=freqz(b,a,t);
+subplot(3,2,3)
+plot(W/pi,20*log10(abs(H)))
+title('Magnitude spectrum')
+xlabel('frequency')
+ylabel('magnitude')
+subplot(3,2,5)
+plot(W/pi,angle(H))
+title('phase spectrum')
+xlabel('frequency')
+ylabel('Angle')
+%stability
+[Z,P,K]=tf2zp(b,a)
+if all(abs(P)<1)
+    disp('Stable')
+else
+    disp('Unstable')
+end
+%Response of the LTI System
+N=0:length(n)-1;
+X=(1/3).^N;
+subplot(3,2,4)
+stem(N,X)
+title(' given input signal')
+xlabel('time')
+ylabel('x[n]')
+disp('response of the given system')
+Y=filter(b,a,X)
+subplot(3,2,6)
+stem(N,Y)
+xlabel('time')
+ylabel('y[n]')
+title('response of the system to the given input')
+
+
+
+
+
+%spectrum sampling
+
+
+clc;
+close all;
+clear all;
+sgtitle('sampling 22BEC0xx')
+A=input('enter the amplitude: ')
+fm=input('enter the message frequency: ')
+t=-5:0.001:5;
+x=A*cos(2*pi*fm*t)
+subplot(4,2,1)
+plot(t,x)
+title('x(t)')
+f1=0.5*fm
+f2=2*fm
+f3=10*fm
+t1=-5:5;
+x1=A*cos(2*pi*fm*t1/f1)
+subplot(4,2,3)
+stem(t1,x1)
+hold on
+subplot(4,2,3)
+plot(t1,x1,'r')
+title('x1(t)')
+t2=-5:5;
+x2=A*cos(2*pi*fm*t2/f2)
+subplot(4,2,5)
+stem(t2,x2)
+hold on
+subplot(4,2,5)
+plot(t2,x2,'b')
+title('x2(t)')
+t3=-5:5;
+x3=A*cos(2*pi*fm*t3/f3)
+subplot(4,2,7)
+stem(t3,x3)
+hold on
+subplot(4,2,7)
+plot(t3,x3,'g')
+title('x3(t)')
+%spectrum
+s=abs(fftshift(fft(x)))
+ns=1000/length(s)
+fs=(-(length(s)-1)/2:(length(s)-1)/2)*ns
+subplot(4,2,2)
+stem(fs,s)
+title('spectrum of x[t]')
+s1=abs(fftshift(fft(x1)))
+ns1=f1/length(s1)
+fs1=(-(length(s1)-1)/2:(length(s1)-1)/2)*ns1
+subplot(4,2,4)
+stem(fs1,s1)
+title('spectrum of x[t1]')
+s2=abs(fftshift(fft(x2)))
+ns2=f2/length(s2)
+fs2=(-(length(s2)-1)/2:(length(s2)-1)/2)*ns2
+subplot(4,2,6)
+stem(fs2,s2)
+title('spectrum of x[t2]')
+s3=abs(fftshift(fft(x3)))
+ns3=f3/length(s3)
+fs3=(-(length(s3)-1)/2:(length(s3)-1)/2)*ns3
+subplot(4,2,8)
+stem(fs3,s3)
+title('spectrum of x[t3]')
+
+
+
+
+
+%CIRCULAR convolution
+
+
+
+
+clc;
+close all;
+clear all;
+%CIRCULAR convolution
+sgtitle('circular convolution-22BEC0xx')
+x=input('enter the values of x=')
+h=input('enter the value of h=')
+nx1=input('enter the x start value=')
+nx2=input('enter the x end value=')
+nh1=input('enter the h start value=')
+nh2=input('enter the h start value=')
+nx=nx1:nx2
+nh=nh1:nh2
+subplot(2,2,1)
+stem(nx,x)
+xlabel('time')
+ylabel('amplitude')
+title('x[n]')
+subplot(2,2,2)
+stem(nh,h)
+xlabel('time')
+ylabel('amplitude')
+title('h[n]')
+ny1=nx1+nh1	
+ny2=nx2+nh2
+N=max(length(x),length(h))
+x1=[x,zeros(1,N-length(x))]
+h1=[h,zeros(1,N-length(h))]
+%convolution inbuilt function
+y1=cconv(x,h,N)
+disp(y1)
+subplot(2,2,3)
+stem(y1)
+xlabel('time')
+ylabel('amplitude')
+title('y[n] builtin')
+%using formula method
+ny=ny1:ny2;
+for i=1:N
+    y(i)=0;
+    k=0;
+    for j=1:N
+         k=i-j+1;
+        if(k<=0)
+           k=k+N
+        end
+           y(i)=(x1(j)*h1(k))+y(i);
+        end
+end
+y
+subplot(2,2,4)
+stem(y)
+xlabel('time')
+ylabel('amplitude')
+title('y[n]formula method')
+disp('OUTPUT')
+disp('Given input sequence x{n}')
+nx
+x
+disp('Given impulse sequence h{n}')
+nh
+h
+disp('convoluted output sequence using for loop')
+ny
+y
+disp('using inbuilt function')
+y1
+
+%auto corellation
+
+
+
+clc;
+close all;
+clear all;
+%correlation
+sgtitle('Auto correlation-22BEC0xx')
+x=input('enter the values of x=')
+nx1=input('enter the x start value=')
+nx2=input('enter the x end value=')
+nx=nx1:nx2
+subplot(2,2,1)
+stem(nx,x)
+xlabel('time')
+ylabel('amplitude')
+title('x[n]')
+x1=fliplr(x)
+nxr=-nx2:-nx1;
+subplot(2,2,2)
+stem(nxr,x1)
+xlabel('time')
+ylabel('amplitude')
+title('x[-n]')
+ny1=nx1-nx2;
+ny2=nx2-nx1;
+ny=ny1:ny2
+N=length(x)+length(x1)-1
+x2=[x,zeros(1,N-length(x))]
+x3=[x1,zeros(1,N-length(x1))]
+%correlation inbuilt function
+y1=xcorr(x)
+subplot(2,2,3)
+stem(ny,y1)
+%using for loop method
+for i=1:N
+    y(i)=0;
+    for j=1:N
+        if(i-j+1)>=1
+            y(i)=(x2(j)*x3(i-j+1))+y(i);
+        end
+    end
+end
+subplot(2,2,4)
+stem(ny,y)
+xlabel('time')
+ylabel('amplitude')
+title('y[n] forloop method')
+disp('OUTPUT')
+disp('Given input sequence x{n}')
+nx
+x
+disp('reversed input  sequence h{n}')
+nxr
+x1
+disp('auto correlated output sequence using for loop')
+ny
+y
+disp('auto correlated output sequence using inbuilt function')
+y1
+
+
+
+
+%cross correlation
+
+
+clc;
+close all;
+clear all;
+%correlation
+sgtitle('Cross correlation-22BEC0xx')
+x=input('enter the values of x=')
+h=input('enter the value of h=')
+nx1=input('enter the x start value=')
+nx2=input('enter the x end value=')
+nh1=input('enter the h start value=')
+nh2=input('enter the h end value=')
+nx=nx1:nx2
+nh=nh1:nh2
+subplot(2,2,1)
+stem(nx,x)
+xlabel('time')
+ylabel('amplitude')
+title('x[n]')
+subplot(2,2,2)
+stem(nh,h)
+xlabel('time')
+ylabel('amplitude')
+title('h[n]')
+n=max(length(x),length(h));
+x1=[x,zeros(1,n-length(x))]
+h1=[h,zeros(1,n-length(h))]
+%convolution inbuilt function
+ny1=nx1+(-(nh2+n-length(h)))
+ny2=(nx2+(n-length(x)))+(-nh1)
+ny=ny1:ny2;
+y1=xcorr(x1,h1)
+subplot(2,2,3)
+stem(ny,y1)
+xlabel('time')
+ylabel('amplitude')
+title('y[n] builtin')
+N=length(x1)+length(h1)-1
+h2=fliplr(h1);
+x2=[x1,zeros(1,N-length(x1))]
+h3=[h2,zeros(1,N-length(h1))]
+%using formula method
+for i=1:N
+    y(i)=0;
+    for j=1:N
+        if(i-j+1)>=1
+            y(i)=(x2(j)*h3(i-j+1))+y(i);
+        end
+    end
+end
+subplot(2,2,4)
+stem(ny,y)
+xlabel('time')
+ylabel('amplitude')
+title('y[n]formula method')
+disp('OUTPUT')
+disp('Given input sequence x{n}')
+nx
+x
+disp('Given impulse sequence h{n}')
+nh
+h
+disp('correlated output sequence using for loop')
+ny
+y
+disp('using inbuilt function')
+y1
+
+
+
+#LINEAR CONVOLUTION:
+clo
+close all:
+clear all;
+sgtitle(linear convolution-')
+x=input('enter the values of x=")
+h=input('enter the value of h="
+nx1=input('enter the x start value=')
+nx2=input('enter the x end value=')
+nh1=input('enter the h start value=')
+nh2-input('enter the h end value=')
+nx=nx1:nx2
+nh-nh1:nh2
+subplot(2,2,1)
+stem(nx,x)
+xlabel('time')
+ylabel('amplitude')
+title('x[n]')
+subplot(2,2,2)
+stem(nh,h)
+xlabel('time')
+ylabel('amplitude')
+title('h[n]')
+%convolution inbuilt function
+ny1=nx1+nh1
+ny2=nx2+nh2
+y1-conv(x.h)
+disp(y1)
+subplot(2,2,3)
+stem(y1)
+xlabel('time')
+ylabel('amplitude")
+title('y[n] builtin')
+N=length(x)+length(h)-1
+x1=[x,zeros(1,N-length(x))]
+y
+h1=[h,zeros(1,N-length(h))]
+%using formula method
+ny-ny1:ny2;
+for i=1:N
+y(i)=0;
+for j=1:N
+if(i-j+1)>=1
+y(i)=(x1(j)*h1(i-j+1))+y(i);
+end
+F
+end
+end
+y
+subplot(2,2,4)
+stem(y)
+xlabel('time')
+ylabel('amplitude')
+title('y[n] formula method")
+disp('OUTPUT')
+disp('Given input sequence x(n) deg
+nx
+disp('Given impulse sequence h{n}')
+nh
+h
+disp('convoluted output sequence using for loop')
+ny
+y
+disp('using inbuilt function')
+y1
+
+
+
+
+sgtitle('IIR CHEBYSHEV FILTER 22BEC0xx')
+wp=input('enter the passband edge freq :')
+ws=input('enter the stopband edge freq :')
+Rp=input('enter the passband ripple :')
+Rs=input('enter the stopband ripple :')
+T=1
+Wp=2*tan(wp/2)/T
+Ws=2*tan(ws/2)/T
+%order of the filter
+[N,Wn]=cheb1ord(Wp,Ws,Rp,Rs)
+[B,A]=cheby1(N,Rp,Wn,'low','s')
+Hs=tf(B,A)
+[B1,A1]=bilinear(B,A,1/T)
+Hz=filt(B1,A1,T)
+w=0:0.01:pi;
+[H,ph]=freqz(B1,A1,w)
+subplot(2,2,1)
+plot(ph/pi,20*log10(abs(H)))
+title('magnitude spectrum')
+subplot(2,2,2)
+plot(ph/pi,angle(H))
+title('phase spectrum')
+
+% impulse invariance method
+
+N,Wn]=cheb1ord(wp,ws,Rp,Rs)
+[B2,A2]=cheby1(N,Rp,Wn,'high','s')
+Hs2=tf(B2,A2)
+[Bz,Az] = impinvar(B2,A2,1/T)
+Hz=filt(Bz,Az,T)
+w=0:0.01:pi; 
+[H1,ph1]=freqz(Bz,Az,w)
+subplot(2,2,3)
+plot(ph1/pi,20*log10(abs(H1)))
+title('magnitude spectrum')
+subplot(2,2,4)
+plot(ph1/pi,angle(H1))
+title('phase spectrum')
+
+
+
+
+%dft
+
+
+clc;
+clear all;
+close all;
+suptitle('implementation of DFT')
+%program for computation of DFT of a sequence by expansion method
+x=input('Enter the sequence:');
+N=length(x)
+n=[0:1:N-1]
+k=[0:1:N-1]
+WN=exp(-j*2*pi/N);
+nk=n'*k;
+WNnk=WN.^nk; 
+X=x*WNnk;
+disp('The DFT of the input sequence is X(K)');
+disp(X)
+M=abs(X);
+disp('The magnitude of the DFT sequence is |X(K)|=');
+disp(M)
+subplot(2,2,1);
+stem(M,'g');
+xlabel('K');
+ylabel('X(K)/');
+title('Magnitude spectrum using direct method');
+ph=angle(X);
+disp('The phase of the DFT sequence is <X(K)=');
+disp(ph)
+sub
+
+plot(2,2,2);
+stem(ph,'b');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using direct method');
+ 
+%program for computation of DFT using FFT algorithm
+X1=fft(x);
+disp('The DFT of the input sequence using FFT algorithm is X(K)=');
+disp(X1)
+M1=abs(X1);
+disp('The magnitude of the DFT sequence using FFT algorithm is X(K)|=');
+disp(M1)
+subplot(2,2,3);
+stem(M1,'c');
+xlabel('K');
+ylabel('|X(K)|');
+title('Magnitude spectrum using FFT algorithm');
+ph1=angle(X);
+disp('The phase of the DFT sequence is using FFT algorithm <X(K)=');
+disp(ph1)
+subplot(2,2,4);
+stem(ph1,'m');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using FFT algorithm');
+
+ 
+ 
+%idft
+
+
+
+clc;
+clear all;
+close all;
+suptitle('implementation of DFT')
+%program for computation of DFT of a sequence by expansion method
+x=input('Enter the sequence:');
+N=length(x)
+n=[0:1:N-1]
+k=[0:1:N-1]
+WN=exp(j*2*pi/N);
+nk=n'*k;
+WNnk=WN.^nk;
+X=x*WNnk;
+disp('The DFT of the input sequence is X(K)');
+disp(X)
+M=abs(X);
+disp('The magnitude of the DFT sequence is |X(K)|=');
+disp(M)
+subplot(2,2,1);
+stem(M,'g');
+xlabel('K');
+ylabel('X(K)/');
+title('Magnitude spectrum using direct method');
+ph=angle(X);
+disp('The phase of the DFT sequence is <X(K)=');
+disp(ph)
+subplot(2,2,2);
+stem(ph,'b');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using direct method');
+ 
+%program for computation of DFT using FFT algorithm
+X1=fft(x);
+disp('The DFT of the input sequence using FFT algorithm is X(K)=');
+disp(X1)
+M1=abs(X1);
+disp('The magnitude of the DFT sequence using FFT algorithm is X(K)|=');
+disp(M1)
+subplot(2,2,3);
+stem(M1,'c');
+xlabel('K');
+ylabel('|X(K)|');
+title('Magnitude spectrum using FFT algorithm');
+ph1=angle(X);
+disp('The phase of the DFT sequence is using FFT algorithm <X(K)=');
+disp(ph1)
+subplot(2,2,4);
+stem(ph1,'m');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using FFT algorithm');
+
+ 
+ 
+
+
+
+% linear conv usinf dft
+
+
+
+clc;
+clear all;
+close all;
+suptitle('implementation of DFT)
+%program for computation of DFT of a sequence by expansion method
+x=input('Enter the sequence:');
+N=length(x)
+n=[0:1:N-1]
+k=[0:1:N-1]
+WN=exp(-j*2*pi/N);
+nk=n'*k;
+WNnk=WN.^nk;
+X=x*WNnk;
+disp('The DFT of the input sequence is X(K)');
+disp(X)
+M=abs(X);
+disp('The magnitude of the DFT sequence is |X(K)|=');
+disp(M)
+subplot(2,2,1);
+stem(M,'g');
+xlabel('K');
+ylabel('X(K)/');
+title('Magnitude spectrum using direct method');
+ph=angle(X);
+disp('The phase of the DFT sequence is <X(K)=');
+disp(ph)
+subplot(2,2,2);
+stem(ph,'b');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using direct method');
+ 
+%program for computation of DFT using FFT algorithm
+X1=fft(x);
+disp('The DFT of the input sequence using FFT algorithm is X(K)=');
+disp(X1)
+M1=abs(X1);
+disp('The magnitude of the DFT sequence using FFT algorithm is X(K)|=');
+disp(M1)
+subplot(2,2,3);
+stem(M1,'c');
+xlabel('K');
+ylabel('|X(K)|');
+title('Magnitude spectrum using FFT algorithm');
+ph1=angle(X);
+disp('The phase of the DFT sequence is using FFT algorithm <X(K)=');
+disp(ph1)
+subplot(2,2,4);
+stem(ph1,'m');
+xlabel('K');
+ylabel('<X(K)');
+title('phase spectrum using FFT algorithm');
+
+ 
+ 
+%circular conv using idft
+
+clc;
+clear all;
+close all;
+suptitle('implementation of circular convolution')
+%program for the Circular convolution using DFT and IDFT
+x=input('Enter the input sequence');
+N1=length(x)
+h=input('Enter the impuse response');
+N2=length(h)
+subplot(2,2,1);
+stem(x,'b');
+xlabel('n');
+ylabel('x(n)');
+title('input sequence');
+subplot(2,2,2);
+stem(h,'r')
+xlabel('n');
+ylabel('h(n)')
+title('impulse response');
+N=max(N1,N2)
+x1=[x zeros(1,N-N1)]
+h1=[h zeros(1,N-N2)]
+X=fft(x1)
+H=fft(h1)
+Y=X.*H
+y=ifft(Y);
+disp('The circular convoluted output using DFT and IDFT is y(n)')
+disp(y)
+subplot(2,2,3);
+stem(y,'g');
+xlabel('n');
+ylabel('y(n)');
+title('output sequence obtained using DFT and IDFT');
+%program for circular convolution using inbuilt function
+y1=cconv(x,h,N);
+disp('The cicular convoluted output using inbuilt function is y(n)')
+disp(y1)
+subplot(2,2,4);
+stem(y1,'m');
+xlabel('n');
+ylabel('y(n)');
+title('output sequence obtained using inbuilt function');
+
+ 
+ 
+
+
+%kit exp linear convolution
+
+
+
+#define X1 4
+#define X2 4
+float x[20] = {1, 2 , 3, 4},y[20] = {1, 2, 3, 4}, lc[40];
+unsigned int i, n;
+void main(void)
+{
+for(n=0; n<((X1+X2)-1); n++)
+{
+for(i=0; i<=n; i++)
+lc[n] = lc[n] + (x[i]*y[n-i]);
+}
+while(1);
+}
+
+
+
+
+
+kit exp filter
+
+DESIGN OF FIR FILTER
+Code :
+#include<stdio.h>
+#include<math.h>
+float x[10],hd[10],w[10],wn;
+void main()
+{
+int k,N,n,y;
+printf("\n enter the length of the filter N");
+scanf("%d",&N);
+printf("\n enter the cutoff frequency");
+scanf("%f",&wn);
+y=(N-1)/2;
+for(n=0;n<=N-1;n++)
+{
+if(n==y)
+hd[n]=wn/3.14;
+else
+hd[n]=sin((n-y)*wn)/(3.14*(n-y));
+}
+printf("select:1.rectangular 2.hamming 3.hanning");
+scanf("%d",&k);
+switch(k)
+{
+case 1:
+for(n=0;n<=N-1;n++)
+w[n]=1;
+break;
+case 2:
+for(n=0;n<=N-1;n++)
+w[n]=0.5-(0.5*cos(3.14*n/y));
+break;
+case 3:
+for(n=0;n<=N-1;n++)
+w[n]=0.54-(0.46*cos(3.14*n/y));
+break;
+default:
+}
+printf("the output is ");
+for(n=0;n<=N-1;n++)
+{
+x[n]=hd[n]*w[n];
+printf("%f\t\n",x[n]);
+}
+}
+
+
+
+
+%FIR CODE
+% Filter specifications
+N = 50; % Filter order
+Wn = 0.4; % Normalized cutoff frequency
+% Design lowpass FIR filter using different window functions
+b_rect_lowpass = fir1(N, Wn, rectwin(N+1));
+b_hamming_lowpass = fir1(N, Wn, hamming(N+1));
+b_hanning_lowpass = fir1(N, Wn, hanning(N+1));
+b_blackman_lowpass = fir1(N, Wn, blackman(N+1));
+% Design highpass FIR filter using different window functions
+b_rect_highpass = fir1(N, Wn, 'high', rectwin(N+1));
+b_hamming_highpass = fir1(N, Wn, 'high', hamming(N+1));
+b_hanning_highpass = fir1(N, Wn, 'high', hanning(N+1));
+b_blackman_highpass = fir1(N, Wn, 'high', blackman(N+1));
+% Design bandpass FIR filter using different window functions
+Wn_bandpass = [0.2, 0.6];
+b_rect_bandpass = fir1(N, Wn_bandpass, rectwin(N+1));
+b_hamming_bandpass = fir1(N, Wn_bandpass, hamming(N+1));
+b_hanning_bandpass = fir1(N, Wn_bandpass, hanning(N+1));
+b_blackman_bandpass = fir1(N, Wn_bandpass, blackman(N+1));
+% Design stopband FIR filter using different window functions
+Wn_stopband = [0.2, 0.6];
+b_rect_stopband = fir1(N, Wn_stopband, 'stop', rectwin(N+1));
+b_hamming_stopband = fir1(N, Wn_stopband, 'stop', hamming(N+1));
+b_hanning_stopband = fir1(N, Wn_stopband, 'stop', hanning(N+1));
+b_blackman_stopband = fir1(N, Wn_stopband, 'stop', blackman(N+1));
+% Frequency response calculation
+freq_response_rect_lowpass = freqz(b_rect_lowpass, 1, 1024);
+freq_response_hamming_lowpass = freqz(b_hamming_lowpass, 1, 1024);
+freq_response_hanning_lowpass = freqz(b_hanning_lowpass, 1, 1024);
+freq_response_blackman_lowpass = freqz(b_blackman_lowpass, 1, 1024);
+freq_response_rect_highpass = freqz(b_rect_highpass, 1, 1024);
+freq_response_hamming_highpass = freqz(b_hamming_highpass, 1, 1024);
+freq_response_hanning_highpass = freqz(b_hanning_highpass, 1, 1024);
+freq_response_blackman_highpass = freqz(b_blackman_highpass, 1, 1024);
+freq_response_rect_bandpass = freqz(b_rect_bandpass, 1, 1024);
+freq_response_hamming_bandpass = freqz(b_hamming_bandpass, 1, 1024);
+freq_response_hanning_bandpass = freqz(b_hanning_bandpass, 1, 1024);
+freq_response_blackman_bandpass = freqz(b_blackman_bandpass, 1, 1024);
+freq_response_rect_stopband = freqz(b_rect_stopband, 1, 1024);
+freq_response_hamming_stopband = freqz(b_hamming_stopband, 1, 1024);
+freq_response_hanning_stopband = freqz(b_hanning_stopband, 1, 1024);
+freq_response_blackman_stopband = freqz(b_blackman_stopband, 1, 1024);
+
+% Plot frequency responses
+
+figure;
+
+% Lowpass Filters
+
+subplot(4, 4, 1);
+plot(linspace(0, 1, length(freq_response_rect_lowpass)), 
+20*log10(abs(freq_response_rect_lowpass)));
+title('Rectangular Lowpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 2);
+plot(linspace(0, 1, length(freq_response_hamming_lowpass)), 
+20*log10(abs(freq_response_hamming_lowpass)));
+title('Hamming Lowpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 3);
+plot(linspace(0, 1, length(freq_response_hanning_lowpass)), 
+20*log10(abs(freq_response_hanning_lowpass)));
+title('Hanning Lowpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 4);
+plot(linspace(0, 1, length(freq_response_blackman_lowpass)), 
+20*log10(abs(freq_response_blackman_lowpass)));
+title('Blackman Lowpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+
+% Highpass Filters
+
+subplot(4, 4, 5);
+plot(linspace(0, 1, length(freq_response_rect_highpass)), 
+20*log10(abs(freq_response_rect_highpass)));
+title('Rectangular Highpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 6);
+plot(linspace(0, 1, length(freq_response_hamming_highpass)), 
+20*log10(abs(freq_response_hamming_highpass)));
+title('Hamming Highpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 7);
+plot(linspace(0, 1, length(freq_response_hanning_highpass)), 
+20*log10(abs(freq_response_hanning_highpass)));
+title('Hanning Highpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 8);
+plot(linspace(0, 1, length(freq_response_blackman_highpass)), 
+20*log10(abs(freq_response_blackman_highpass)));
+title('Blackman Highpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+
+% Bandpass Filters
+
+subplot(4, 4, 9);
+plot(linspace(0, 1, length(freq_response_rect_bandpass)), 
+20*log10(abs(freq_response_rect_bandpass)));
+title('Rectangular Bandpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 10);
+plot(linspace(0, 1, length(freq_response_hamming_bandpass)), 
+20*log10(abs(freq_response_hamming_bandpass)));
+title('Hamming Bandpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 11);
+plot(linspace(0, 1, length(freq_response_hanning_bandpass)), 
+20*log10(abs(freq_response_hanning_bandpass)));
+title('Hanning Bandpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 12);
+plot(linspace(0, 1, length(freq_response_blackman_bandpass)), 
+20*log10(abs(freq_response_blackman_bandpass)));
+title('Blackman Bandpass');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+
+% Stopband Filters
+subplot(4, 4, 13);
+plot(linspace(0, 1, length(freq_response_rect_stopband)), 
+20*log10(abs(freq_response_rect_stopband)));
+title('Rectangular Stopband');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 14);
+plot(linspace(0, 1, length(freq_response_hamming_stopband)), 
+20*log10(abs(freq_response_hamming_stopband)));
+title('Hamming Stopband');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 15);
+plot(linspace(0, 1, length(freq_response_hanning_stopband)), 
+20*log10(abs(freq_response_hanning_stopband)));
+title('Hanning Stopband');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+subplot(4, 4, 16);
+plot(linspace(0, 1, length(freq_response_blackman_stopband)), 
+20*log10(abs(freq_response_blackman_stopband)));
+title('Blackman Stopband');
+xlabel('Normalized Frequency');
+ylabel('Magnitude (dB)');
+grid on;
+
+% Adjusting layout
+
+sgtitle('FIR FILTER 22BECxx AND 22BECxx');
+
+
+
+####IIR FILTER
+close all;
+clear all;
+sgtitle('IIR FILTER butterwoth -22BECxx 22BECxx')
+T=1;
+Ap=20*log10(1/0.707);
+As=20*log10(1/0.2);
+wp=1/4;
+ws=3/4;
+ 
+%prewarpped analog freq
+ 
+op=(2/T)*tan((wp/2));
+os=(2/T)*tan((ws/2));
+ 
+%order of filter
+[N,wc]=buttord(op,os,Ap,As,'s')
+ 
+%bilinear transformationA
+[b,a]=butter(N,wc,'high','s');
+Hs=tf(b,a);
+filt(b,a)
+[b1,a1]=bilinear(b,a,T)
+Hz=tf(b1,a1)
+filt(b1,a1)
+om=0:0.01:pi
+[H,ph]=freqz(b1,a1,om)
+subplot(2,2,1)
+plot((ph/pi),20*log10(abs(H)))
+title('magnitude spect using bilinear transformation highpass')
+ylabel('|H(e^jw)|')
+xlabel('angular freq')
+subplot(2,2,2)
+plot((ph/pi),angle(H))
+title('phase spect using bilinear transformation highpass')
+ylabel('|_(H(e^jw))')
+xlabel('angular freq')
+ 
+%impulse invariance
+[N,wc]=buttord(wp,ws,Ap,As,'s');
+[b3,a3]=butter(N,wc,'low','s');
+Hs=tf(b3,a3);
+filt(b3,a3)
+[b4,a4]=impinvar(b3,a3,T);
+Hz=tf(b4,a4);
+filt(b4,a4)
+om=0:0.01:pi;
+[H,ph]=freqz(b4,a4,om);
+subplot(2,2,3)
+plot((ph/pi),20*log10(abs(H)))
+title('magnitude spect using impulse invariance lowpass')
+ylabel('|H(e^jw)|')
+xlabel('angular freq')
+subplot(2,2,4)
+plot((ph/pi),angle(H))
+title('phase spect using impulse invariance lowpass')
+ylabel('<(H(e^jw))')
+xlabel('angular freq')
+
+
+
+
+
+
+Close all;
+Clear all;
+Sgtitle('IIR FILTER chebyshev -22BECxx 22BECxx')
+T=1;
+Ap=input('enter the value of passband ripple:');
+As=input('enter the value of passband ripple:');
+Wp=input('enter the value of passband freq:');
+Ws=input('enter the value of passband freq:');
+ 
+%prewarpped analog freq
+ 
+Op=(2/T)*tan((wp/2));
+Os=(2/T)*tan((ws/2));
+ 
+%order of filter
+[N,wc]=cheb1ord(op,os,Ap,As);
+ 
+%bilinear transformation
+[b,a]=cheby1(N,Ap,op);
+Hs=tf(b,a);
+Filt(b,a)
+[b1,a1]=bilinear(b,a,T);
+Hz=tf(b1,a1);
+Filt(b1,a1)
+Om=0:0.01:pi;
+[H,ph]=freqz(b1,a1,om);
+Subplot(2,2,1)
+Plot((ph/pi),20*log(abs(H)))
+Title('magnitude spect using bilinear transformation')
+Ylabel('|H(e^jw)|')
+Xlabel('angular freq')
+Subplot(2,2,2)
+Plot((ph/pi),angle(H))
+Title('phase spect using bilinear transformation')
+Ylabel('<(H(e^jw))')
+Xlabel('angular freq')
+ 
+%impulse invariance
+ 
+[b3,a3]=cheby1(N,Ap,op,'stop','s');
+Hs=tf(b3,a3);
+Filt(b3,a3)
+[b4,a4]=impinvar(b3,a3,T);
+Hz=tf(b4,a4);
+Filt(b4,a4)
+Om=0:0.01:pi;
+[H,ph]=freqz(b4,a4,om);
+Subplot(2,2,3)
+Plot((ph/pi),20*log(abs(H)))
+Title('magnitude spect using impulse invariance')
+Ylabel('|H(e^jw)|')
+Xlabel('angular freq')
+Subplot(2,2,4)
+Plot((ph/pi),angle(H))
+Title('phase spect using impulse invariance')
+Ylabel('<(H(e^jw))')
+Xlabel('angular freq')
+
+
+
+
+#####SAMPLING 
+CT INDEPENDENT
+sgtitle('CT-Operation on independent variable-22BEC311)
+%CT signal
+t=-5:0.01:5
+x=[zeros(1,300),ones(1,100),2*ones(1,101),ones(1,100),-1*ones(1,200),zeros(1,200)]
+subplot(6,1,1)
+plot(t,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('Given Signal')
+%timedelayby2units
+subplot(6,1,2)
+plot(t+2,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time delay by 2 units')
+%timeadvanceby3units
+subplot(6,1,3)
+plot(t-3,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time advance by 3 units')
+%timereversed
+subplot(6,1,4)
+plot(-1*t,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time reversed')
+%timeexpansiondby3units
+subplot(6,1,5)
+plot(t*3,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time expansiond by 3 units')
+%timecompressionby2units
+subplot(6,1,6)
+plot(t/2,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time compression by 2 units')
+
+
+DT INDEPENDENT
+sgtitle('DT-Operation on independent variable-22BEC311')
+%CT signal
+t=-5:5;
+x=[zeros(1,3),ones(1,1),2*ones(1,2),ones(1,1),-1*ones(1,2),zeros(1,2)];
+subplot(6,1,1) me 
+stem(t,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('Given Signal')
+%timedelayby2units
+subplot(6,1,2)
+stem(t+2,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time delay by 2 units')
+%timeadvanceby3units
+subplot(6,1,3)
+stem(t-3,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time advance by 3 units')
+%timereversed
+subplot(6,1,4)
+stem(-1*t,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time reversed')
+%timeexpansiondby3units
+subplot(6,1,5)
+stem(t*3,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time expansiond by 3 units')
+%timecompressionby2units
+subplot(6,1,6)
+t1=-10:2:10;
+stem(t1/2,x)
+axis([-6 9 -1 2])
+xlabel('Amplitude')
+ylabel('Time')
+title('time compression by 2 units')
+
+
+t=-5*pi:pi/4;5*pi;
+y1=11.7*sin(t) ;
+sgtitle('DT-operation on dependent signal-22BEC311') 
+subplot(3, 2,1) 
+stem(t, y1) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT sinusoidal') 
+y2=5*sin(0.2*t) ;
+subplot(3, 2,2) 
+stem(t, y2) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT sinusoidal')
+x=y1+y2;
+subplot(3, 2,3) 
+stem(t, x) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT Addition')
+x1=y1-y2;
+subplot(3, 2,4) 
+stem(t, x1) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT subtraction')
+x3=5*y1;
+subplot(3, 2,5) 
+stem(t, x3) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT Amplitude multiplication')
+x4=y1.*y2;
+subplot(3, 2,6) 
+stem(t, x4) 
+xlabel('Time') 
+ylabel('Amplitude') 
+title('DT multiplication')
+clc;
+clear all;
+
+close all;
+suptitle('Spectral analysis of sampled signal - 22BEC311')
+t=(-1:0.001:1)*10^(-3);
+fm=1000;
+a=sin(2*pi*fm*t)
+subplot(4,2,1)
+plot(t,a)
+xlabel('time')
+ylabel('amplitude')
+title('given ct sinusoidal')
+fs1=1.1*fm
+fs2=2*fm
+fs3=10*fm
+T=1/fm;
+%under sampling
+t1=-10:10;
+x1=sin(2*pi*(fm/fs1)*t1);
+subplot(4,2,2)
+stem(t1,x1)
+hold on;
+subplot(4,2,2)
+plot(t1,x1,'g')
+xlabel('time')
+ylabel('amplitude')
+title('under sampling')
+%critally sampled
+t2=-10:10;
+x2=sin(2*pi*(fm/fs2)*t2);
+subplot(4,2,3)
+stem(t2,x2)
+hold on;
+subplot(4,2,3)
+plot(t2,x2,'r')
+xlabel('time')
+ylabel('amplitude')
+title('critically sampled')
+
+%oversampled
+t3=-5:5;
+x3=sin(2*pi*(fm/fs3)*t3);
+subplot(4,2,4)
+stem(t3,x3)
+hold on;
+subplot(4,2,4)
+plot(t3,x3,'b')
+xlabel('time')
+ylabel('amplitude')
+title('over sampled')
+
+%given fft
+y=fftshift(fft(a))
+nd=1000*10^3/(length(y))
+ns=[-(length(y)-1)/2:(length(y)-1)/2]*nd;
+subplot(4,2,5)
+stem(ns,abs(y))
+xlabel('time')
+ylabel('amplitude')
+title('given sampled')
+
+%fft(x1)
+y1=fftshift(fft(x1))
+nd1=fs1/length(y1)
+ns1=[-(length(y1)-1)/2:(length(y1)-1)/2]*nd1;
+subplot(4,2,6)
+stem(ns1,abs(y1))
+xlabel('time')
+ylabel('amplitude')
+title('under sampled')
+
+%fft(x2)
+y2=fftshift(fft(x2))
+nd2=fs2/length(y2)
+ns2=[-(length(y2)-1)/2:(length(y2)-1)/2]*nd2;
+subplot(4,2,7)
+stem(ns2,abs(y2),'g')
+xlabel('time')
+ylabel('amplitude')
+title('critically sampled')
+
+%fft (x3)
+y3=fftshift(fft(x3))
+nd3=fs3/length(y3)
+ns3=[-(length(y3)-1)/2:(length(y3)-1)/2]*nd3;
+subplot(4,2,8)
+stem(ns3,abs(y3),'p')
+xlabel('time')
+ylabel('amplitude')
+title('over sampled')
